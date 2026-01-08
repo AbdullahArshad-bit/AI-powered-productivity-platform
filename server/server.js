@@ -6,9 +6,31 @@ const connectDB = require('./config/db');
 dotenv.config();
 const app = express();
 
+// --- CORS CONFIGURATION (Sabse Zaroori Hissa) ---
+const allowedOrigins = [
+  "https://ai-productivity-frontend.vercel.app", // Tumhari Live Website
+  "https://ai-powered-productivity-platform-wvsoq4l7h.vercel.app", // Backend Link (Self)
+  "http://localhost:5173", // Vite Localhost
+  "http://localhost:3000"  // React Localhost
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Agar koi origin nahi hai (matlab Postman ya Server-to-Server) ya list mein hai
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log("Blocked by CORS:", origin); // Logs check karne ke liye
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true, // Cookies aur Headers allow karne ke liye
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+}));
+// ------------------------------------------------
+
 // Middleware
 app.use(express.json());
-app.use(cors());
 
 // Database Connection
 connectDB();
@@ -43,7 +65,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: err.message, stack: process.env.NODE_ENV === 'production' ? null : err.stack });
 });
 
-// --- MAIN CHANGE IS HERE ---
+// --- SERVER START LOGIC ---
 
 const PORT = process.env.PORT || 5000;
 
