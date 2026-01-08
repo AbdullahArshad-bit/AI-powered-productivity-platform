@@ -6,25 +6,23 @@ const connectDB = require('./config/db');
 dotenv.config();
 const app = express();
 
-// --- CORS CONFIGURATION (Sabse Zaroori Hissa) ---
-const allowedOrigins = [
-  "https://ai-productivity-frontend.vercel.app", // Tumhari Live Website
-  "https://ai-powered-productivity-platform-wvsoq4l7h.vercel.app", // Backend Link (Self)
-  "http://localhost:5173", // Vite Localhost
-  "http://localhost:3000"  // React Localhost
-];
-
+// --- CORS CONFIGURATION (Dynamic Update) ---
 app.use(cors({
   origin: function (origin, callback) {
-    // Agar koi origin nahi hai (matlab Postman ya Server-to-Server) ya list mein hai
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+    // Logic:
+    // 1. !origin -> Postman ya Server-to-Server calls allow karo
+    // 2. localhost -> Development ke liye allow karo
+    // 3. vercel.app -> Vercel ke kisi bhi domain (production ya preview) ko allow karo
+    const isAllowed = !origin || origin.includes("localhost") || origin.includes("vercel.app");
+
+    if (isAllowed) {
       callback(null, true);
     } else {
-      console.log("Blocked by CORS:", origin); // Logs check karne ke liye
+      console.log("Blocked by CORS:", origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true, // Cookies aur Headers allow karne ke liye
+  credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 }));
 // ------------------------------------------------
