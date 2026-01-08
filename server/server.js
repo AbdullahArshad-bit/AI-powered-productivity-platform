@@ -6,15 +6,13 @@ const connectDB = require('./config/db');
 dotenv.config();
 const app = express();
 
-// --- CORS CONFIGURATION (Dynamic Update) ---
-app.use(cors({
+// --- CORS CONFIGURATION (Updated) ---
+// Humne config ko alag variable mein rakh liya taake do jagah use kar sakein
+const corsOptions = {
   origin: function (origin, callback) {
-    // Logic:
-    // 1. !origin -> Postman ya Server-to-Server calls allow karo
-    // 2. localhost -> Development ke liye allow karo
-    // 3. vercel.app -> Vercel ke kisi bhi domain (production ya preview) ko allow karo
+    // Logic: Localhost ya Vercel ka koi bhi link allow karo
     const isAllowed = !origin || origin.includes("localhost") || origin.includes("vercel.app");
-
+    
     if (isAllowed) {
       callback(null, true);
     } else {
@@ -22,10 +20,17 @@ app.use(cors({
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-}));
-// ------------------------------------------------
+  credentials: true, // Cookies/Headers allow
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"] // Headers explicitly allow kiye
+};
+
+// 1. Regular Requests ke liye CORS lagao
+app.use(cors(corsOptions));
+
+// 2. Preflight (OPTIONS) Requests ke liye bhi Same CORS lagao (Ye Missing tha!)
+app.options('*', cors(corsOptions));
+// ------------------------------------
 
 // Middleware
 app.use(express.json());
@@ -64,15 +69,12 @@ app.use((err, req, res, next) => {
 });
 
 // --- SERVER START LOGIC ---
-
 const PORT = process.env.PORT || 5000;
 
-// Logic: Agar file direct run ho rahi hai (Local PC) to Listen karo
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
 }
 
-// Vercel ke liye export
 module.exports = app;
