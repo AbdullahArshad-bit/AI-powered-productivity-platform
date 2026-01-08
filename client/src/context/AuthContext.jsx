@@ -3,6 +3,10 @@ import axios from 'axios';
 
 const AuthContext = createContext();
 
+// YAHAN APNA VERCEL BACKEND LINK LIKHO (Bina '/' ke end mein)
+// Example: 'https://ai-task-assistant.vercel.app'
+const API_URL = 'https://ai-powered-productivity-platform-wvsoq4l7h.vercel.app';
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -20,7 +24,8 @@ export const AuthProvider = ({ children }) => {
             const config = {
                 headers: { 'Content-Type': 'application/json' },
             };
-            const { data } = await axios.post('http://localhost:5000/api/auth/login', { email, password }, config);
+            // Yahan humne API_URL variable use kiya hai
+            const { data } = await axios.post(`${API_URL}/api/auth/login`, { email, password }, config);
             
             // Check if email verification is required
             if (data.requiresVerification) {
@@ -45,7 +50,8 @@ export const AuthProvider = ({ children }) => {
             const config = {
                 headers: { 'Content-Type': 'application/json' },
             };
-            const { data } = await axios.post('http://localhost:5000/api/auth/register', { name, email, password }, config);
+            // Yahan bhi API_URL use kiya
+            const { data } = await axios.post(`${API_URL}/api/auth/register`, { name, email, password }, config);
             
             // If registration requires email verification
             if (data.requiresVerification) {
@@ -57,7 +63,7 @@ export const AuthProvider = ({ children }) => {
                 };
             }
             
-            // If user is directly logged in (shouldn't happen with new flow)
+            // If user is directly logged in
             setUser(data);
             localStorage.setItem('userInfo', JSON.stringify(data));
             return { success: true };
