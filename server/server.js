@@ -1,4 +1,3 @@
-// server.js (Modified)
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
@@ -33,6 +32,7 @@ app.get('/test-projects', (req, res) => {
   });
 });
 
+// Root Route
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
@@ -40,9 +40,19 @@ app.get('/', (req, res) => {
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error("Global Error:", err.stack);
-  res.status(500).json({ message: err.message });
+  res.status(500).json({ message: err.message, stack: process.env.NODE_ENV === 'production' ? null : err.stack });
 });
 
-// YAHAN SE app.listen HATA DIYA HAI
+// --- MAIN CHANGE IS HERE ---
 
-module.exports = app; // Sirf App export hogi
+const PORT = process.env.PORT || 5000;
+
+// Logic: Agar file direct run ho rahi hai (Local PC) to Listen karo
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+// Vercel ke liye export
+module.exports = app;
