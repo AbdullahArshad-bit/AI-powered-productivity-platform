@@ -3,9 +3,9 @@ import axios from 'axios';
 
 const AuthContext = createContext();
 
-// YAHAN APNA VERCEL BACKEND LINK LIKHO (Bina '/' ke end mein)
-// Example: 'https://ai-task-assistant.vercel.app'
-const API_URL = 'https://ai-powered-productivity-platform-wvsoq4l7h.vercel.app';
+// --- CHANGE: Wapis Localhost kar diya hai ---
+const API_URL = 'http://localhost:5000'; 
+// -------------------------------------------
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -24,7 +24,6 @@ export const AuthProvider = ({ children }) => {
             const config = {
                 headers: { 'Content-Type': 'application/json' },
             };
-            // Yahan humne API_URL variable use kiya hai
             const { data } = await axios.post(`${API_URL}/api/auth/login`, { email, password }, config);
             
             // Check if email verification is required
@@ -50,7 +49,6 @@ export const AuthProvider = ({ children }) => {
             const config = {
                 headers: { 'Content-Type': 'application/json' },
             };
-            // Yahan bhi API_URL use kiya
             const { data } = await axios.post(`${API_URL}/api/auth/register`, { name, email, password }, config);
             
             // If registration requires email verification
